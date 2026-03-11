@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small Web Today</title>
+    <meta name="description" content="Discover new posts from the small web, updated every 24 hours.">
+    
+    <style>
+        :root {
+            --bg-color: #fdfaf6;
+            --text-main: #2c2c2c;
+            --text-muted: #4c4b49;
+            --sep-muted: #b5b3b0;
+            --link-color:#1d4ed8;
+        }
+
+        @font-face {
+            font-family: 'Menlo';
+            src:
+                url('/static/fonts/Menlo-Bold.woff2') format('woff2'),
+                url('/static/fonts/Menlo-Bold.woff') format('woff'),
+                url('/static/fonts/Menlo-Bold.ttf') format('ttf');
+            font-weight: bold;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Menlo';
+            src:
+                url('/static/fonts/Menlo-Regular.woff2') format('woff2'),
+                url('/static/fonts/Menlo-Regular.woff') format('woff'),
+                url('/static/fonts/Menlo-Regular.ttf') format('ttf');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        body { 
+            font-family: 'Menlo', monospace; 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            margin: 0; 
+            padding: 4rem 1.5rem;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { 
+            max-width: 680px; 
+            margin: auto; 
+        }
+
+        .header {
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--sep-muted);
+            margin-top:4rem;
+            padding-bottom: 4rem;
+        }
+
+        .header h1 {
+            font-weight:800;
+            font-size:1.25rem;
+            -moz-osx-font-smoothing:grayscale;
+            margin-bottom:0.25rem;
+        }
+
+        .header h1 a {
+            color: var(--text-main);
+        }
+
+        .meta {
+            color: var(--text-muted);
+            font-weight:400;
+            font-size:0.75rem;
+            -moz-osx-font-smoothing:grayscale;
+        }
+
+        ul { padding: 0; margin: 0; list-style: none; }
+
+        a {
+            text-decoration: none;
+        }
+
+        .post-item { 
+            padding-bottom: 2rem;
+        }
+
+        .post-item a:hover {
+            color: var(--link-color);
+            text-decoration: underline;
+        }
+
+        .post-item .meta a {
+            color: var(--text-muted);
+        }
+
+        .post-title {
+            display: inline-block;
+            font-size: 1rem; 
+            font-weight: 800;
+            color: var(--text-main); 
+            text-decoration: none;
+            margin-bottom: 0.25rem;
+            transition: color 0.2s;
+        }
+
+        .dot { color: var(--sep-muted); }
+
+        @media (max-width: 600px) {
+            body { padding: 2.5rem 1rem; }
+            .header { margin-bottom: 2.5rem; }
+            .post-title { font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><a href="/">smallweb.today</a></h1>
+            <div class="meta"> 	
+                {{ len . }} posts discovered in the last 24 hours
+            </div>
+        </header>
+
+        <main>
+            <ul>
+                {{ range $index, $post := . }}
+                <li class="post-item">
+                    <a class="post-title" href="{{ .PostURL }}">{{ .PostTitle }}</a>
+                    <div class="meta">
+                        <span>{{ formatTime .DiscoveredUTC }}</span>
+                        <span class="dot">/</span>
+                        <a href="https://{{ .BaseURL }}">{{ .BaseURL }}</a>
+                    </div>
+                </li>
+                {{ else }}
+                <p class="post-meta">No posts discovered in the last 24 hours.</p>
+                {{ end }}
+            </ul>
+        </main>
+    </div>
+</body>
+</html>

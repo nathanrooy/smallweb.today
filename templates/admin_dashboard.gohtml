@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - smallweb.today</title>
+    <link rel="stylesheet" href="/public/style.css">
+    <style>
+        body { font-family: Verdana, Geneva, sans-serif; background-color: #f6f6ef; margin: 0; padding: 10px; }
+        .container { max-width: 800px; margin: auto; }
+        .header {padding: 2px; font-weight: bold; margin-bottom: 10px; }
+        .post-item { margin-bottom: 5px; list-style: none; display: flex; align-items: baseline; }
+        .rank { color: #828282; margin-right: 5px; min-width: 20px; text-align: right; font-size: 10pt; }
+        .title { font-size: 10pt; color: #000; text-decoration: none; }
+        .subtext { font-size: 7pt; color: #828282; margin-left: 25px; margin-bottom: 1rem;}
+        ul { padding: 0rem;}
+        li { border: 1px solid black; }
+        .post-item {
+            border: 2px solid #ddd; /* Default grey */
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            list-style: none;
+            transition: border-color 0.2s;
+        }
+
+        .post-verified {
+            border-color: #3498db; /* Professional Blue */
+            background-color: #f7fbff;
+        }
+
+        .post-unverified {
+            border-color: #e74c3c; /* Alert Red */
+            background-color: #fffaf9;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">← Back to Site</a> | 
+        <a href="/admin/logout">Logout</a>
+    </nav>
+
+    <main>
+        <h1>Welcome, Admin</h1>
+        <div class="admin-actions">
+            <section>
+                <h2>Quick Actions</h2>
+                <ul>
+                    <li><a href="/api/admin/create">Add New Post</a></li>
+                    <li><a href="/api/admin/stats">View Traffic Stats</a></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Database Status</h2>
+                <p>Connected to: <code>"smallweb-today".public.posts</code></p>
+            </section>
+        </div>
+
+        <form action="/admin/save-annotations" method="POST">
+            <ul>
+                {{ range $index, $post := .Posts }}
+
+                <li class="post-item {{ if .Verified }}post-verified{{ else }}post-unverified{{ end }}">
+                    <span class="rank">{{ add $index 1 }}.</span>
+                    <input type="hidden" name="base--{{ $post.PostURL }}" value="{{ $post.BaseURL }}">
+                    <input type="hidden" name="posturl" value="{{ $post.PostURL }}">
+
+                    <div>
+                        <a class="title" href="{{ $post.PostURL }}"><h3>{{ $post.PostTitle }}</h3></a>
+                        <p class="meta">{{ formatTime $post.DiscoveredUTC }} | <a href="https://{{ $post.BaseURL }}">{{ $post.BaseURL }}</a></p>
+                    </div>
+
+
+                    <div class="annotations" style="font-size: 9pt; margin-top: 5px; display: flex; gap: 15px;">
+                        {{ $currentAnnotations := $post.Annotations }}
+                        {{ range $.Definitions }}
+                            {{ $attr := .Attribute }}
+                            <div class="checkbox-group" style="border: 1px solid #ccc; padding: 5px; border-radius: 4px;">
+                                <strong style="display: block; border-bottom: 1px solid #eee; margin-bottom: 5px;">{{ $attr }}</strong>
+                                <input type="hidden" name="ann--{{ $post.PostURL }}--{{ $attr }}" value="">
+                                {{ range .Options }}
+                                    <label style="display: block; cursor: pointer;">
+                                        <input type="checkbox" 
+                                            name="ann--{{ $post.PostURL }}--{{ $attr }}" 
+                                            value="{{ . }}" 
+                                            {{ if isSelected $currentAnnotations $attr . }}checked{{ end }}>
+                                        {{ . }}
+                                    </label>
+                                {{ end }}
+
+                            </div>
+                        {{ end }}
+                    </div>
+
+                </li>
+
+                {{ else }}
+                <p>No posts in the last 24 hours.</p>
+                {{ end }}
+            </ul>
+
+            {{ if . }}
+                <div style="position: sticky; bottom: 20px; background: white; padding: 20px; border-top: 2px solid #000;">
+                    <button type="submit" style="padding: 10px 20px; cursor: pointer; background: #ff6600; color: white; border: none; font-weight: bold;">
+                        Save Annotations
+                    </button>
+                </div>
+            {{ end }}
+
+        </form>
+    </main>
+</body>
+</html>

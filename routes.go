@@ -18,19 +18,19 @@ func Router(store *db.DB, landingPageHTML *atomic.Value) http.HandlerFunc {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.Write([]byte(landingPageHTML.Load().(string)))
 
-		case "/admin", "/admin/":
+		case "/admin":
 			admin.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
-				admin.RenderAdminDashboard(w, r, store)
+				admin.RenderAdminMain(w, r, store)
 			})(w, r)
 
-		case "/admin/dashboard":
+		case "/admin/annotate-posts":
 			admin.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
-				admin.RenderAdminDashboard(w, r, store)
+				admin.RenderPostAnnotationDashboard(w, r, store)
 			})(w, r)
 
-		case "/admin/save-annotations":
+		case "/admin/save-post-annotations":
 			admin.AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
-				admin.SaveAnnotations(w, r, store)
+				admin.SavePostAnnotations(w, r, store)
 			})(w, r)
 
 		case "/admin/login":
@@ -38,6 +38,7 @@ func Router(store *db.DB, landingPageHTML *atomic.Value) http.HandlerFunc {
 
 		case "/admin/logout":
 			admin.AuthMiddleware(admin.LogoutHandler)(w, r)
+
 		default:
 			http.NotFound(w, r)
 		}

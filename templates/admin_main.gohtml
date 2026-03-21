@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - smallweb.today</title>
+    <link rel="stylesheet" href="/public/style.css">
+    <style>
+        body { font-family: Verdana, Geneva, sans-serif; background-color: #f6f6ef; margin: 0; padding: 10px; }
+        .container { max-width: 800px; margin: auto; }
+        .header {padding: 2px; font-weight: bold; margin-bottom: 10px; }
+        .post-item { margin-bottom: 5px; list-style: none; display: flex; align-items: baseline; }
+        .rank { color: #828282; margin-right: 5px; min-width: 20px; text-align: right; font-size: 10pt; }
+        .title { font-size: 10pt; color: #000; text-decoration: none; }
+        .subtext { font-size: 7pt; color: #828282; margin-left: 25px; margin-bottom: 1rem;}
+        ul { padding: 0rem;}
+        li { border: 1px solid black; }
+        .post-item {
+            border: 2px solid #ddd; /* Default grey */
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            list-style: none;
+            transition: border-color 0.2s;
+        }
+
+        .post-verified {
+            border-color: #3498db; /* Professional Blue */
+            background-color: #f7fbff;
+        }
+
+        .post-unverified {
+            border-color: #e74c3c; /* Alert Red */
+            background-color: #fffaf9;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">← Back to Site</a> | 
+        <a href="/admin/logout">Logout</a>
+    </nav>
+
+    <main>
+        <h1>Admin - Home</h1>
+        <div class="admin-actions">
+            <section>
+                <h2>Quick Actions</h2>
+                <ul>
+                    <li><a href="/admin/annotate-posts">Annotate posts</a></li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

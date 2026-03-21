@@ -42,23 +42,17 @@
     </nav>
 
     <main>
-        <h1>Welcome, Admin</h1>
+        <h1>Admin - Annotate Posts</h1>
         <div class="admin-actions">
             <section>
                 <h2>Quick Actions</h2>
                 <ul>
-                    <li><a href="/api/admin/create">Add New Post</a></li>
-                    <li><a href="/api/admin/stats">View Traffic Stats</a></li>
+                    <li><a href="/admin">Admin home</a></li>
                 </ul>
-            </section>
-
-            <section>
-                <h2>Database Status</h2>
-                <p>Connected to: <code>"smallweb-today".public.posts</code></p>
             </section>
         </div>
 
-        <form action="/admin/save-annotations" method="POST">
+        <form action="/admin/save-post-annotations" method="POST">
             <ul>
                 {{ range $index, $post := .Posts }}
 

@@ -65,7 +65,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		// redirect to the dashboard on success
-		http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		return
 	}
 }

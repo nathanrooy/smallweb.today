@@ -15,7 +15,7 @@ func dedupePosts(posts []*models.Post) []*models.Post {
 		uniquePostsMap[post.PostURL] = post
 	}
 
-	// convert batck to a slice
+	// convert batch to a slice
 	var dedupedPosts []*models.Post
 	for _, post := range uniquePostsMap {
 		dedupedPosts = append(dedupedPosts, post)
@@ -32,7 +32,7 @@ func (d *DB) SavePosts(ctx context.Context, tx *sql.Tx, posts []*models.Post) er
 
 	// query header
 	var b strings.Builder
-	b.WriteString("UPSERT INTO posts (base_url, feed_url, post_url, post_title, utc_published, utc_discovered) VALUES ")
+	b.WriteString("INSERT INTO posts (base_url, feed_url, post_url, post_title, utc_published, utc_discovered) VALUES ")
 
 	// munge the posts for postgres
 	vals := make([]interface{}, 0, len(posts)*6)
@@ -44,6 +44,8 @@ func (d *DB) SavePosts(ctx context.Context, tx *sql.Tx, posts []*models.Post) er
 		fmt.Fprintf(&b, "($%d, $%d, $%d, $%d, $%d, $%d)", n+1, n+2, n+3, n+4, n+5, n+6)
 		vals = append(vals, p.BaseURL, p.FeedURL, p.PostURL, p.PostTitle, p.PublishedUTC, p.DiscoveredUTC)
 	}
+
+	b.WriteString(" ON CONFLICT (post_url) DO NOTHING")
 
 	_, err := tx.ExecContext(ctx, b.String(), vals...)
 	return err

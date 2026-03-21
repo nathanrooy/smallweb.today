@@ -3,22 +3,18 @@ package worker
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/mmcdole/gofeed"
-	_ "modernc.org/sqlite"
 	"smallweb.today/internal/db"
 	"smallweb.today/internal/models"
 )
 
 type Worker struct {
-	db           *db.DB
-	client       *http.Client
-	parser       *gofeed.Parser
-	currentCount *int64
-	totalCount   int
+	db     *db.DB
+	client *http.Client
+	parser *gofeed.Parser
 }
 
 type WorkerResult struct {
@@ -46,9 +42,6 @@ func (w *Worker) Run(ctx context.Context, jobs <-chan *models.FeedState, results
 			return
 		default:
 			workerResult := w.processFeed(ctx, f)
-			if workerResult.Err != nil {
-				log.Printf("Error processing %s: %v", f.FeedURL, workerResult.Err)
-			}
 			workerResult.State.LastChecked = time.Now().UTC()
 			results <- workerResult
 		}

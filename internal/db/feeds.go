@@ -16,7 +16,7 @@ func (d *DB) UpdateFeedStates(ctx context.Context, tx *sql.Tx, states []*models.
 	}
 
 	var b strings.Builder
-	b.WriteString("UPSERT INTO feed_states (feed_url, last_checked, last_modified, etag) VALUES ")
+	b.WriteString("INSERT INTO feed_states (feed_url, last_checked, last_modified, etag) VALUES ")
 
 	vals := make([]interface{}, 0, len(states)*4)
 	for i, s := range states {
@@ -27,6 +27,12 @@ func (d *DB) UpdateFeedStates(ctx context.Context, tx *sql.Tx, states []*models.
 		fmt.Fprintf(&b, "($%d, $%d, $%d, $%d)", n+1, n+2, n+3, n+4)
 		vals = append(vals, s.FeedURL, s.LastChecked, s.LastModified, s.ETag)
 	}
+
+	b.WriteString(`
+		ON CONFLICT (feed_url) DO UPDATE SET
+			last_checked = EXCLUDED.last_checked,
+			last_modified = EXCLUDED.last_modified,
+			etag = EXCLUDED.etag`)
 
 	_, err := tx.ExecContext(ctx, b.String(), vals...)
 	return err

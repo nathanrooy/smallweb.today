@@ -5,7 +5,7 @@
     <title>Admin Dashboard - smallweb.today</title>
     <link rel="stylesheet" href="/public/style.css">
     <style>
-        body { font-family: Verdana, Geneva, sans-serif; background-color: #f6f6ef; margin: 0; padding: 10px; }
+        body { font-family: Verdana, Geneva, sans-serif; background-color: #f6f6ef; margin: 0; padding: 10px; max-width:90vw; margin:auto; }
         .container { max-width: 800px; margin: auto; }
         .header {padding: 2px; font-weight: bold; margin-bottom: 10px; }
         .post-item { margin-bottom: 5px; list-style: none; display: flex; align-items: baseline; }
@@ -25,7 +25,12 @@
 
         .post-verified {
             border-color: #3498db; /* Professional Blue */
-            background-color: #f7fbff;
+            background-color: #dbe8fa;
+        }
+
+        .post-verified-admin {
+            border-color: #34db37; /* Professional Blue */
+            background-color: #dcfadb;
         }
 
         .post-unverified {
@@ -43,6 +48,12 @@
 
     <main>
         <h1>Admin - Annotate Posts</h1>
+        <ul style="border: none;">
+            <li style="border: none;">Total posts: {{ $.Stats.Total }}</li>
+            <li style="border: none;">Verified posts: {{ .Stats.Verified }} ({{ pcnt $.Stats.Verified $.Stats.Total }} %)</li>
+            <li style="border: none;">Admin verified posts: {{ .Stats.VerifiedAdmin }} ({{ pcnt $.Stats.VerifiedAdmin $.Stats.Total }}%)</li>
+        </ul>
+
         <div class="admin-actions">
             <section>
                 <h2>Quick Actions</h2>
@@ -56,7 +67,7 @@
             <ul>
                 {{ range $index, $post := .Posts }}
 
-                <li class="post-item {{ if .Verified }}post-verified{{ else }}post-unverified{{ end }}">
+                <li class="post-item {{ if .VerifiedAdmin }}post-verified-admin{{ else if .Verified }}post-verified{{ else }}post-unverified{{ end }}">
                     <span class="rank">{{ add $index 1 }}.</span>
                     <input type="hidden" name="base--{{ $post.PostURL }}" value="{{ $post.BaseURL }}">
                     <input type="hidden" name="posturl" value="{{ $post.PostURL }}">

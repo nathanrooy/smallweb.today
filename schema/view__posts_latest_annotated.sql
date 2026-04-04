@@ -22,6 +22,7 @@ latest_posts as (
     	posts.*,
     	feeds_filtered.sources,
     	feeds_filtered.verified,
+		feeds_filtered.verified_admin,
     	feeds_filtered.verified_count,
 		coalesce(post_annotations_aggregated.annotations ? 'hide', false) as hide,
 		coalesce(post_annotations_aggregated.annotations, '{}'::jsonb) as annotations

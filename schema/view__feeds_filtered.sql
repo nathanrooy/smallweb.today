@@ -1,4 +1,4 @@
-drop materialized view if exists feeds_filtered;
+drop materialized view if exists feeds_filtered cascade;
 create materialized view feeds_filtered as
 with feeds as (
     select
@@ -66,6 +66,7 @@ select
 	feed_url,
 	sources,
 	verified,
+	case when 'admin' = any(sources) then true else false end as verified_admin,
 	verified_count
 from final
 where not_small_web = false

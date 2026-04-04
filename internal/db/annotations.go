@@ -62,6 +62,7 @@ func (d *DB) GetAnnotatedPosts(ctx context.Context) ([]models.AnnotatedPost, err
 		utc_published,
 		sources,
 		verified,
+		verified_admin,
 		verified_count,
 		hide,
 		annotations
@@ -80,7 +81,7 @@ func (d *DB) GetAnnotatedPosts(ctx context.Context) ([]models.AnnotatedPost, err
 		var p models.AnnotatedPost
 		if err := rows.Scan(
 			&p.BaseURL, &p.PostURL, &p.PostTitle, &p.DiscoveredUTC, &p.PublishedUTC,
-			pq.Array(&p.Sources), &p.Verified, &p.VerifiedCount, &p.Hide, &p.Annotations); err != nil {
+			pq.Array(&p.Sources), &p.Verified, &p.VerifiedAdmin, &p.VerifiedCount, &p.Hide, &p.Annotations); err != nil {
 			return nil, err
 		}
 		annotatedPosts = append(annotatedPosts, p)

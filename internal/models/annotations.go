@@ -36,6 +36,7 @@ type AnnotatedPost struct {
 	PublishedUTC  time.Time `db:"utc_published"`
 	Sources       []string  `db:"sources"`
 	Verified      bool      `db:"verified"`
+	VerifiedAdmin bool      `db:"verified_admin"`
 	VerifiedCount int       `db:"verified_count"`
 	Hide          bool      `db:"hide"`
 	Annotations   JSONMap   `db:"annotations"`

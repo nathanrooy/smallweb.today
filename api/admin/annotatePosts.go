@@ -16,6 +16,7 @@ import (
 type AdminPageData struct {
 	Posts       []models.AnnotatedPost
 	Definitions []models.AnnotationDefinition
+	Stats       map[string]int
 }
 
 func RenderPostAnnotationDashboard(w http.ResponseWriter, r *http.Request, store *db.DB) {
@@ -35,10 +36,35 @@ func RenderPostAnnotationDashboard(w http.ResponseWriter, r *http.Request, store
 		return
 	}
 
+	// munge the data
+	var buf bytes.Buffer
+	pageData := AdminPageData{
+		Posts:       posts,
+		Definitions: defs,
+		Stats:       make(map[string]int),
+	}
+
+	// get some basic annotation stats
+	for _, post := range posts {
+		pageData.Stats["Total"]++
+		if post.Verified {
+			pageData.Stats["Verified"]++
+		}
+		if post.VerifiedAdmin {
+			pageData.Stats["VerifiedAdmin"]++
+		}
+	}
+
 	// define some helper functions
 	funcMap := template.FuncMap{
 		"add": func(a, b int) int {
 			return a + b
+		},
+		"pcnt": func(a, b int) float64 {
+			if b == 0 {
+				return 0
+			}
+			return 100 * float64(a) / float64(b)
 		},
 		"formatTime": webutil.RelativeTime,
 
@@ -46,13 +72,6 @@ func RenderPostAnnotationDashboard(w http.ResponseWriter, r *http.Request, store
 		"isSelected": func(annotations map[string][]string, attr string, val string) bool {
 			return slices.Contains(annotations[attr], val)
 		},
-	}
-
-	// munge the data
-	var buf bytes.Buffer
-	pageData := AdminPageData{
-		Posts:       posts,
-		Definitions: defs,
 	}
 
 	// load the template

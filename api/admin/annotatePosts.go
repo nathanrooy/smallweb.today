@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"slices"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -14,38 +15,58 @@ import (
 )
 
 type AdminPageData struct {
-	Posts       []models.AnnotatedPost
-	Definitions []models.AnnotationDefinition
-	Stats       map[string]int
+	Posts          []models.AnnotatedPost
+	Definitions    []models.AnnotationDefinition
+	Stats          map[string]int
+	ShowVerified   bool
+	ShowUnverified bool
 }
 
 func RenderPostAnnotationDashboard(w http.ResponseWriter, r *http.Request, store *db.DB) {
 
+	// munge the data
+	var buf bytes.Buffer
+	pageData := AdminPageData{
+		Stats:          make(map[string]int),
+		ShowVerified:   false,
+		ShowUnverified: false,
+	}
+
+	// parse the verified/unverified display url params
+	query := r.URL.Query()
+	if query.Has("show-verified") {
+		pageData.ShowVerified, _ = strconv.ParseBool(query.Get("show-verified"))
+	}
+	if query.Has("show-unverified") {
+		pageData.ShowUnverified, _ = strconv.ParseBool(query.Get("show-unverified"))
+	}
+
+	// if no display params have been set, assign the default
+	if pageData.ShowVerified == false && pageData.ShowUnverified == false {
+		pageData.ShowVerified = true
+	}
+
 	// get the annotation definitions
-	defs, err := store.GetAnnotationDefinitions(r.Context())
+	var err error
+	pageData.Definitions, err = store.GetAnnotationDefinitions(r.Context())
 	if err != nil {
 		http.Error(w, "Error fetching annotation definitions", 500)
 		return
 	}
 
 	// get the data
-	posts, err := store.GetAnnotatedPosts(r.Context())
+	pageData.Posts, err = store.GetAnnotatedPosts(r.Context(), pageData.ShowVerified, pageData.ShowUnverified)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Error fetching posts", 500)
 		return
 	}
 
-	// munge the data
-	var buf bytes.Buffer
-	pageData := AdminPageData{
-		Posts:       posts,
-		Definitions: defs,
-		Stats:       make(map[string]int),
-	}
-
 	// get some basic annotation stats
-	for _, post := range posts {
+	pageData.Stats["Verified"] = 0
+	pageData.Stats["VerifiedAdmin"] = 0
+	pageData.Stats["Total"] = 0
+	for _, post := range pageData.Posts {
 		pageData.Stats["Total"]++
 		if post.Verified {
 			pageData.Stats["Verified"]++

@@ -50,9 +50,9 @@ func (d *DB) GetAnnotationDefinitions(ctx context.Context) ([]models.AnnotationD
 	return definitions, nil
 }
 
-func (d *DB) GetAnnotatedPosts(ctx context.Context) ([]models.AnnotatedPost, error) {
+func (d *DB) GetAnnotatedPosts(ctx context.Context, verified bool, unverified bool) ([]models.AnnotatedPost, error) {
 
-	// define the query
+	// construct the query
 	query := `
 	SELECT
 		base_url,
@@ -66,9 +66,19 @@ func (d *DB) GetAnnotatedPosts(ctx context.Context) ([]models.AnnotatedPost, err
 		verified_count,
 		hide,
 		annotations
-	from public.posts_latest_annotated
-	order by utc_discovered desc
-	limit 5000;`
+	from public.posts_latest_annotated`
+
+	// add visability filters
+	if verified == true && unverified == false {
+		query += ` where verified = true`
+	} else if verified == false && unverified == true {
+		query += ` where verified = false`
+	}
+
+	// finish
+	query += ` order by utc_discovered desc limit 2500;`
+
+	// get the data
 	rows, err := d.conn.QueryContext(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)

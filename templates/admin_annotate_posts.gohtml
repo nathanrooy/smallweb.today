@@ -50,7 +50,7 @@
         <h1>Admin - Annotate Posts</h1>
         <ul style="border: none;">
             <li style="border: none;">Total posts: {{ $.Stats.Total }}</li>
-            <li style="border: none;">Verified posts: {{ .Stats.Verified }} ({{ pcnt $.Stats.Verified $.Stats.Total }} %)</li>
+            <li style="border: none;">Verified posts: {{ .Stats.Verified }} ({{ pcnt $.Stats.Verified $.Stats.Total }}%)</li>
             <li style="border: none;">Admin verified posts: {{ .Stats.VerifiedAdmin }} ({{ pcnt $.Stats.VerifiedAdmin $.Stats.Total }}%)</li>
         </ul>
 
@@ -93,22 +93,22 @@
 
 
                     <div class="annotations" style="font-size: 9pt; margin-top: 5px; display: flex; gap: 15px;">
-                        {{ $currentAnnotations := $post.Annotations }}
-                        {{ range $.Definitions }}
-                            {{ $attr := .Attribute }}
-                            <div class="checkbox-group" style="border: 1px solid #ccc; padding: 5px; border-radius: 4px;">
-                                <strong style="display: block; border-bottom: 1px solid #eee; margin-bottom: 5px;">{{ $attr }}</strong>
-                                <input type="hidden" name="ann--{{ $post.PostURL }}--{{ $attr }}" value="">
-                                {{ range .Options }}
+                        {{ range $definition := $.Definitions }}
+                             <div class="checkbox-group" style="border: 1px solid #ccc; padding: 5px; border-radius: 4px;">
+                                <strong style="display: block; border-bottom: 1px solid #eee; margin-bottom: 5px;">{{ $definition.Target }}:{{ $definition.Attribute }}</strong>
+                                {{ range $definition.Options }}
                                     <label style="display: block; cursor: pointer;">
-                                        <input type="checkbox" 
-                                            name="ann--{{ $post.PostURL }}--{{ $attr }}" 
-                                            value="{{ . }}" 
-                                            {{ if isSelected $currentAnnotations $attr . }}checked{{ end }}>
+                                        <input type="checkbox"
+                                            {{ if eq $definition.Target "post" }}
+                                                name="ann---{{$post.BaseURL}}---{{ $definition.Target }}---{{ $post.PostURL }}---admin---{{ $definition.Attribute }}" 
+                                            {{ else if eq $definition.Target "feed" }}
+                                                name="ann---{{$post.BaseURL}}---{{ $definition.Target }}---{{ $post.FeedURL }}---admin---{{ $definition.Attribute }}" 
+                                            {{ end }}
+                                                value="{{ . }}"
+                                            {{ if isSelected $post.Annotations $definition.Attribute . }}checked{{ end }}>
                                         {{ . }}
                                     </label>
                                 {{ end }}
-
                             </div>
                         {{ end }}
                     </div>

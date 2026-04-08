@@ -127,37 +127,28 @@ func SavePostAnnotations(w http.ResponseWriter, r *http.Request, store *db.DB) {
 		return
 	}
 
-	// map: [PostURL] -> [Attribute] -> []Values
-	updates := make(map[string]map[string][]string)
-
-	// map: [PostURL] -> BaseURL
-	baseURLs := make(map[string]string)
-
+	// munge the form data into annotation records
+	updates := []models.AnnotationRecord{}
 	for key, values := range r.PostForm {
-
-		if strings.HasPrefix(key, "ann--") {
-			parts := strings.Split(key, "--")
-			if len(parts) == 3 {
-				postURL, attr := parts[1], parts[2]
-				if _, ok := updates[postURL]; !ok {
-					updates[postURL] = make(map[string][]string)
-				}
-				updates[postURL][attr] = values
-			}
-		}
-
-		// handle baseURL lookup
-		if strings.HasPrefix(key, "base--") {
-			parts := strings.Split(key, "--")
-			if len(parts) == 2 {
-				postURL := parts[1]
-				baseURLs[postURL] = values[0]
+		if strings.HasPrefix(key, "ann---") {
+			parts := strings.Split(key, "---")
+			if len(parts) == 6 && len(values) == 1 {
+				updates = append(updates, models.AnnotationRecord{
+					BaseURL:         parts[1],
+					Target:          parts[2],
+					TargetURL:       parts[3],
+					Annotator:       parts[4],
+					AnnotationType:  parts[5],
+					AnnotationValue: values[0],
+				})
 			}
 		}
 	}
 
+	log.Println(">>>", updates)
+
 	// save new annotations
-	err := store.SaveAnnotations(r.Context(), updates, baseURLs)
+	err := store.SaveAnnotations(r.Context(), updates)
 	if err != nil {
 		log.Printf("CRITICAL DATABASE ERROR: %v", err)
 		http.Error(w, "Failed to save new annotations", http.StatusInternalServerError)

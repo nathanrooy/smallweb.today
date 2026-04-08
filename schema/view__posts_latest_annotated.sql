@@ -7,11 +7,12 @@ with post_annotations_aggregated as (
 	from (
 		select
 			base_url,
-			post_url,
+			target_url as post_url,
 			annotation_type,
 			jsonb_agg(annotation_value) as annotation_values
-		from post_annotations
-		group by base_url, post_url, annotation_type
+		from annotations
+		where target = 'post'
+		group by base_url, target_url, annotation_type
 
 	)
 	group by base_url, post_url
@@ -20,6 +21,7 @@ with post_annotations_aggregated as (
 latest_posts as (
     select
     	posts.*,
+		feeds_filtered.feed_url,
     	feeds_filtered.sources,
     	feeds_filtered.verified,
 		feeds_filtered.verified_admin,

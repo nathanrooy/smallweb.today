@@ -24,12 +24,14 @@ func (m *JSONMap) Scan(value interface{}) error {
 }
 
 type AnnotationDefinition struct {
+	Target    string   `db:"target"`
 	Attribute string   `db:"attribute"`
 	Options   []string `db:"options"`
 }
 
 type AnnotatedPost struct {
 	BaseURL       string    `db:"base_url"`
+	FeedURL       string    `db:"feed_url"`
 	PostURL       string    `db:"post_url"`
 	PostTitle     string    `db:"post_title"`
 	DiscoveredUTC time.Time `db:"utc_discovered"`
@@ -44,7 +46,8 @@ type AnnotatedPost struct {
 
 type AnnotationRecord struct {
 	BaseURL         string
-	PostURL         string
+	Target          string
+	TargetURL       string
 	Annotator       string
 	AnnotationType  string
 	AnnotationValue string

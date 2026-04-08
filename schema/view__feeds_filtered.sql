@@ -29,7 +29,7 @@ feed_annotations_aggregated as (
 				else 0
 			end
 		)::bool as is_small_web
-	from post_annotations
+	from annotations
 	group by base_url
 ),
 
